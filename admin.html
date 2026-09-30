@@ -24,4 +24,28 @@ async function del(e){if(!confirm('Hapus gambar ini dari galeri?'))return;try{aw
 async function checkSession(){const d=await api('/api/admin/status');return d.authenticated===true}
 async function init(){try{if(await checkSession()){document.getElementById('loginBox').classList.add('hidden');document.getElementById('adminBox').classList.remove('hidden');document.getElementById('logout').classList.remove('hidden');await load()}else{document.getElementById('loginBox').classList.remove('hidden');document.getElementById('adminBox').classList.add('hidden');document.getElementById('logout').classList.add('hidden')}}catch{document.getElementById('loginBox').classList.remove('hidden');document.getElementById('adminBox').classList.add('hidden')}}
 document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const s=document.getElementById('loginStatus');s.textContent='Memeriksa...';try{await api('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:document.getElementById('username').value,password:document.getElementById('password').value})});await init()}catch(err){s.textContent=err.message;s.className='status err'}});document.getElementById('logout').addEventListener('click',async()=>{await api('/api/admin/logout',{method:'POST'});location.reload()});init();
-</script></body></html>
+</script>
+<div class="admin-editor">
+<h3>Edit Tulisan Website</h3>
+<label>Judul</label>
+<input type="text" id="editJudul">
+<label>Isi Informasi</label>
+<textarea id="editIsi"></textarea>
+<label>Harga PPDB</label>
+<input type="text" id="editHarga">
+<label>Syarat Pendaftaran</label>
+<textarea id="editSyarat"></textarea>
+<label>Jadwal Pendaftaran</label>
+<input type="text" id="editJadwal">
+<button>Simpan Perubahan</button>
+</div>
+</body>
+</html>
+
+<script>
+/* Tambahan kategori galeri */
+const tambahanKategori = {
+ id: "prestasi",
+ nama: "Prestasi Sekolah"
+};
+</script>

@@ -334,4 +334,9 @@ function renderProgramGallery(items){
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 (async function loadProgramGallery(){try{const r=await fetch('/api/gallery',{cache:'no-store'});if(!r.ok)return;const d=await r.json();renderProgramGallery(d.items||[])}catch(e){}})();
 </script>
+
+<section id="prestasi-sekolah" class="gallery-section">
+<h2>PRESTASI SEKOLAH</h2>
+<div id="prestasi-gallery"></div>
+</section>
 </body></html>
