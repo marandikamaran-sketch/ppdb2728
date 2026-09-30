@@ -3,10 +3,10 @@ import { isAdmin, json } from './_auth.mjs';
 import crypto from 'node:crypto';
 
 const CATEGORIES = new Set([
-  'quran', 'inclusion', 'language', 'leadership', 'environment', 'prestasi'
+  'quran', 'inclusion', 'language', 'leadership', 'environment'
 ]);
 const MAX_BYTES = 4_800_000;
-const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm']);
+const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 function store() { return getStore('smpit-program-gallery'); }
 
@@ -32,13 +32,13 @@ export default async (req) => {
     const title = String(form.get('title') || '').trim();
     const file = form.get('file');
     if (!CATEGORIES.has(category)) return json({ error: 'Kategori tidak valid.' }, 400);
-    if (!title) return json({ error: 'Judul file wajib diisi.' }, 400);
-    if (!(file instanceof File)) return json({ error: 'File belum dipilih.' }, 400);
-    if (!TYPES.has(file.type)) return json({ error: 'Gunakan JPG, PNG, WEBP, GIF, MP4, atau WEBM.' }, 400);
+    if (!title) return json({ error: 'Judul gambar wajib diisi.' }, 400);
+    if (!(file instanceof File)) return json({ error: 'File gambar belum dipilih.' }, 400);
+    if (!TYPES.has(file.type)) return json({ error: 'Gunakan JPG, PNG, WEBP, atau GIF.' }, 400);
     if (file.size > MAX_BYTES) return json({ error: 'Ukuran gambar maksimal 4,8 MB.' }, 400);
 
     const id = crypto.randomUUID();
-    const ext = ({ 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/gif':'gif', 'video/mp4':'mp4', 'video/webm':'webm' })[file.type];
+    const ext = ({ 'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/gif':'gif' })[file.type];
     const imageKey = `image/${id}.${ext}`;
     const meta = { id, category, title, fileName: file.name, type: file.type, size: file.size, imageKey, createdAt: new Date().toISOString() };
     await db.set(imageKey, file, { metadata: { category, title } });
