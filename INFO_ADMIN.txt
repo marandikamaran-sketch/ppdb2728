@@ -1,0 +1,2 @@
+Versi ini menggunakan editor admin langsung. Tidak menggunakan CMS eksternal.
+Admin login lalu melakukan perubahan dari panel admin.
