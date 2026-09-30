@@ -79,6 +79,27 @@ background:linear-gradient(transparent,rgba(0,70,30,.92));color:#fff;font-weight
 .program-gallery-item img{display:block;width:100%;height:105px;object-fit:cover;transition:transform .25s ease}
 .program-gallery-item:hover img{transform:scale(1.04)}
 .program-gallery-caption{padding:6px 7px;font-size:11px;font-weight:700;color:#214b27;line-height:1.25}
+
+/* Preview dokumentasi hanya menampilkan 2 foto */
+.program-gallery-item:nth-child(n+3){
+  display:none;
+}
+
+.show-all-gallery{
+  grid-column:1/-1;
+  margin-top:8px;
+  border:0;
+  background:#145c18;
+  color:#fff;
+  padding:10px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.show-all-gallery:hover{
+  background:#21852a;
+}
 @media(max-width:950px){.program-gallery-item img{height:120px}}
 @media(max-width:560px){.program-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
@@ -362,12 +383,47 @@ nextImg=function(){if(programMode&&programLightboxItems.length){nextProgram()}el
 prevImg=function(){if(programMode&&programLightboxItems.length){prevProgram()}else oldPrevImg()};
 closeImg=function(){programMode=false;programLightboxItems=[];oldCloseImg()};
 function renderProgramGallery(items){
+
   document.querySelectorAll('[data-gallery-program]').forEach(el=>{
-    const cat=el.dataset.galleryProgram;const list=items.filter(x=>x.category===cat);
-    if(!list.length){el.innerHTML='<div class="program-gallery-empty">Belum ada dokumentasi</div>';return}
-    el.innerHTML=list.map((x,i)=>`<button class="program-gallery-item" type="button" aria-label="Lihat ${escapeHtml(x.title)}"><img src="${x.url}" alt="${escapeHtml(x.title)}" loading="lazy"><div class="program-gallery-caption">${escapeHtml(x.title)}</div></button>`).join('');
-    el.querySelectorAll('.program-gallery-item').forEach((btn,i)=>btn.addEventListener('click',()=>openProgramGallery(list,i)));
+
+    const cat = el.dataset.galleryProgram;
+    const list = items.filter(x=>x.category===cat);
+
+    if(!list.length){
+      el.innerHTML='<div class="program-gallery-empty">Belum ada dokumentasi</div>';
+      return;
+    }
+
+    const preview = list.slice(0,2);
+
+    el.innerHTML =
+    preview.map((x,i)=>`
+      <button class="program-gallery-item" type="button">
+        <img src="${x.url}" alt="${escapeHtml(x.title)}" loading="lazy">
+        <div class="program-gallery-caption">${escapeHtml(x.title)}</div>
+      </button>
+    `).join('')
+    +
+    (list.length > 2 ? `
+      <button class="show-all-gallery" type="button">
+        + Lihat Semua Dokumentasi (${list.length})
+      </button>
+    ` : '');
+
+    el.querySelectorAll('.program-gallery-item').forEach((btn,i)=>{
+      btn.addEventListener('click',()=>openProgramGallery(list,i));
+    });
+
+    const showBtn = el.querySelector('.show-all-gallery');
+
+    if(showBtn){
+      showBtn.addEventListener('click',()=>{
+        openProgramGallery(list,0);
+      });
+    }
+
   });
+
 }
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 (async function loadProgramGallery(){try{const r=await fetch('/api/gallery',{cache:'no-store'});if(!r.ok)return;const d=await r.json();renderProgramGallery(d.items||[])}catch(e){}})();
