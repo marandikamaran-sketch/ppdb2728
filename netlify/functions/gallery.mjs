@@ -3,7 +3,7 @@ import { isAdmin, json } from './_auth.mjs';
 import crypto from 'node:crypto';
 
 const CATEGORIES = new Set([
-  'quran', 'inclusion', 'language', 'leadership', 'environment'
+  'unggulan', 'kegiatan', 'fasilitas', 'ekskul', 'prestasi'
 ]);
 const MAX_BYTES = 4_800_000;
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);

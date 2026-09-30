@@ -1,58 +1,31 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Galeri - SMPIT Sahabat Alam</title><style>
-:root{--g:#145c18;--g2:#21852a;--cream:#f5faef;--text:#214b27;--muted:#667466;--red:#b3261e}*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f7faf5;color:var(--text)}.wrap{width:min(1100px,92%);margin:auto}.top{background:var(--g);color:#fff;padding:22px 0}.topin{display:flex;justify-content:space-between;align-items:center;gap:12px}.top h1{margin:0;font-size:24px}.btn{border:0;border-radius:999px;padding:11px 18px;font-weight:800;cursor:pointer}.green{background:var(--g2);color:#fff}.white{background:#fff;color:var(--g)}.red{background:#fff0ef;color:var(--red)}main{padding:34px 0}.login,.panel{background:#fff;border-radius:18px;padding:26px;box-shadow:0 10px 35px rgba(20,92,24,.09);margin-bottom:20px}label{display:block;font-weight:800;margin:12px 0 6px}input,select{width:100%;padding:12px;border:1px solid #d8e3d5;border-radius:10px;font:inherit}input[type=file]{padding:9px;background:#fafcf8}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.program{border:1px solid #e2eadf;border-radius:16px;padding:18px;background:var(--cream)}.program h3{margin:0 0 12px;color:var(--g)}.status{margin:12px 0;font-weight:700}.hidden{display:none}.gallery-admin{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}.thumb{background:#fff;border-radius:10px;overflow:hidden;border:1px solid #e1e8df}.thumb img{width:100%;height:130px;object-fit:cover;display:block}.thumb .meta{padding:8px;font-size:12px}.thumb button{margin:0 8px 8px}.public-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.pub-card{background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e1e8df;cursor:pointer}.pub-card img{width:100%;height:150px;object-fit:cover}.pub-card div{padding:8px;font-weight:700;font-size:13px}.help{color:var(--muted);font-size:14px}.ok{color:#1b6d26}.err{color:var(--red)}@media(max-width:700px){.grid,.gallery-admin,.public-gallery{grid-template-columns:1fr}.topin{align-items:flex-start;flex-direction:column}}
-</style></head><body><header class="top"><div class="wrap topin"><h1>Admin Galeri SMPIT Sahabat Alam</h1><button id="logout" class="btn white hidden">Keluar</button></div></header><main class="wrap"><section id="loginBox" class="login"><h2>Login Admin</h2><p class="help">Halaman pengelolaan galeri. Hanya akun admin yang dapat mengunggah atau menghapus gambar.</p><form id="loginForm"><label>Username</label><input id="username" autocomplete="username" required><label>Password</label><input id="password" type="password" autocomplete="current-password" required><button class="btn green" type="submit" style="margin-top:14px">Masuk</button><div id="loginStatus" class="status"></div></form></section><section id="adminBox" class="hidden"><div class="panel"><h2>Kelola Galeri Program Unggulan</h2><p class="help">Pilih kategori, masukkan judul gambar, lalu pilih file. Gambar akan tampil di bawah program yang sesuai pada website publik.</p><p class="help">Format: JPG, PNG, WEBP, GIF. Maksimal 4,8 MB per gambar.</p></div><div id="programGrid" class="grid"></div></section></main><script>
-const programs=[['quran',"Education Based on the Qur'an and Hadits"],['inclusion','Inclusion Islamic School'],['language','Arabic and English Habituation'],['leadership','Leadership and Entrepreneurship'],['environment','Sekolah Berbudaya Lingkungan (SBL)']];
-let items=[];
-const esc=s=>String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-async function api(url,opt={}){const r=await fetch(url,{credentials:'same-origin',...opt});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.error||'Terjadi kesalahan');return d}
-function renderAdmin(){document.getElementById('programGrid').innerHTML=programs.map(([id,name])=>`<div class="program"><h3>${esc(name)}</h3><form data-cat="${id}" class="uploadForm"><label>Judul gambar</label><input name="title" placeholder="Contoh: Kegiatan Tilawah" required><label>Pilih file gambar (bisa pilih lebih dari satu foto)</label><input name="file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple required><button class="btn green" type="submit" style="margin-top:12px">+ Masukkan Gambar</button><div class="status formStatus"></div></form><div class="gallery-admin">${items.filter(x=>x.category===id).map(x=>`<div class="thumb"><img src="${x.url}" alt="${esc(x.title)}"><div class="meta">${esc(x.title)}</div><button class="btn red deleteBtn" data-id="${x.id}">Hapus</button></div>`).join('')}</div></div>`).join('');document.querySelectorAll('.uploadForm').forEach(f=>f.addEventListener('submit',upload));document.querySelectorAll('.deleteBtn').forEach(b=>b.addEventListener('click',del));}
-async function load(){const d=await api('/api/gallery');items=d.items||[];renderAdmin()}
-async function upload(e){e.preventDefault();const f=e.currentTarget, status=f.querySelector('.formStatus');status.textContent='Mengunggah...';status.className='status formStatus';const files=f.querySelector('input[name="file"]').files;
-if(!files.length){status.textContent='File gambar belum dipilih.';status.classList.add('err');return}
-try{
- for(const file of files){
-   const data=new FormData();
-   data.append('title', f.querySelector('[name="title"]').value);
-   data.append('file', file);
-   data.append('category', f.dataset.cat);
-   await api('/api/gallery',{method:'POST',body:data});
- }
- status.textContent=files.length+' gambar berhasil ditambahkan.';
- status.classList.add('ok');f.reset();await load()
-}catch(err){status.textContent=err.message;status.classList.add('err')}}
-async function del(e){if(!confirm('Hapus gambar ini dari galeri?'))return;try{await api('/api/gallery/delete/'+e.currentTarget.dataset.id,{method:'DELETE'});await load()}catch(err){alert(err.message)}}
-async function checkSession(){const d=await api('/api/admin/status');return d.authenticated===true}
-async function init(){try{if(await checkSession()){document.getElementById('loginBox').classList.add('hidden');document.getElementById('adminBox').classList.remove('hidden');document.getElementById('logout').classList.remove('hidden');await load()}else{document.getElementById('loginBox').classList.remove('hidden');document.getElementById('adminBox').classList.add('hidden');document.getElementById('logout').classList.add('hidden')}}catch{document.getElementById('loginBox').classList.remove('hidden');document.getElementById('adminBox').classList.add('hidden')}}
-document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();const s=document.getElementById('loginStatus');s.textContent='Memeriksa...';try{await api('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:document.getElementById('username').value,password:document.getElementById('password').value})});await init()}catch(err){s.textContent=err.message;s.className='status err'}});document.getElementById('logout').addEventListener('click',async()=>{await api('/api/admin/logout',{method:'POST'});location.reload()});init();
-</script>
-<div class="panel">
-<h2>Edit Semua Tulisan Website</h2>
-<p>Gunakan panel ini untuk mengubah konten website.</p>
-<label>Judul PPDB</label>
-<input id="editJudul">
-<label>Deskripsi</label>
-<textarea id="editDeskripsi"></textarea>
-<label>Harga PPDB</label>
-<input id="editHarga">
-<label>Syarat PPDB</label>
-<textarea id="editSyarat"></textarea>
-<label>Jadwal PPDB</label>
-<input id="editJadwal">
-<button onclick="saveWebsiteText()">Simpan</button>
+<!doctype html><html><head><meta charset="utf-8"><title>Admin Website SMPIT Sahabat Alam</title>
+<style>
+body{margin:0;font-family:Arial;background:#f5faf0;color:#214b27}
+.header{background:#145c18;color:white;padding:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px}
+.card{background:white;padding:20px;border-radius:15px;box-shadow:0 5px 20px #ddd}
+iframe{width:100%;height:700px;border:1px solid #ddd;border-radius:10px}
+input,textarea{width:100%;padding:10px;margin:6px 0}
+button{background:#145c18;color:white;padding:10px;border:0;border-radius:8px}
+</style></head><body>
+<div class="header"><h1>Admin PPDB SMPIT Sahabat Alam</h1><p>Edit melalui admin, tampilan mengikuti website.</p></div>
+<div class="grid">
+<div class="card">
+<h2>Edit Konten Website</h2>
+<label>Judul</label><input>
+<label>Deskripsi</label><textarea></textarea>
+<label>Harga PPDB</label><input>
+<label>Syarat</label><textarea></textarea>
+<label>Jadwal</label><input>
+<label>Early Bird</label><input>
+<button>Simpan Perubahan</button>
+<h2>Galeri</h2>
+<select><option>Program Unggulan</option><option>Kegiatan Sekolah</option><option>Fasilitas Sekolah</option><option>Ekstrakurikuler</option><option>Prestasi Sekolah</option></select>
+<input type="file" multiple>
+<button>Upload Foto</button>
 </div>
-<script>
-async function saveWebsiteText(){
- alert('Data editor siap disimpan melalui fungsi admin.');
-}
-</script>
-</body></html>
-
-<script>
-window.galleryCategories = [
- {id:'unggulan',name:'Program Unggulan'},
- {id:'kegiatan',name:'Kegiatan Sekolah'},
- {id:'fasilitas',name:'Fasilitas Sekolah'},
- {id:'ekskul',name:'Ekstrakurikuler'},
- {id:'prestasi',name:'Prestasi Sekolah'}
-];
-</script>
+<div class="card">
+<h2>Preview Website</h2>
+<iframe src="index.html"></iframe>
+</div>
+</div></body></html>
