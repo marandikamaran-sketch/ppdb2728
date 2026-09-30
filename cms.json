@@ -1,0 +1,21 @@
+{
+  "texts": {
+    "site_title": "Informasi PPDB 2027/2028",
+    "registration_fee": "Rp250.000,-",
+    "early_bird": "EARLY BIRD - Diskon untuk 20 Pendaftar pertama",
+    "requirements": "Mengisi formulir pendaftaran, fotokopi akta lahir, kartu keluarga, pas foto, observasi akademik, BTQ dan wawancara",
+    "schedule": "Senin-Sabtu | 08.00-14.00 WIB",
+    "prestasi_title": "PRESTASI SEKOLAH"
+  },
+  "menus": [
+    "Beranda",
+    "Informasi PPDB",
+    "Program Unggulan",
+    "Prestasi Sekolah",
+    "Kontak"
+  ],
+  "images": {
+    "logo": "assets/logo.jpg",
+    "banner": "assets/background-atas-bawah.jpeg"
+  }
+}
