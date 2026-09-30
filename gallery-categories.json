@@ -1,0 +1,24 @@
+{
+  "categories": [
+    {
+      "id": "unggulan",
+      "name": "Program Unggulan"
+    },
+    {
+      "id": "kegiatan",
+      "name": "Kegiatan Sekolah"
+    },
+    {
+      "id": "fasilitas",
+      "name": "Fasilitas Sekolah"
+    },
+    {
+      "id": "ekskul",
+      "name": "Ekstrakurikuler"
+    },
+    {
+      "id": "prestasi",
+      "name": "Prestasi Sekolah"
+    }
+  ]
+}
